@@ -9,6 +9,7 @@ class AssistantState(TypedDict, total=False):
     question: str
     student_id: str | None
     retrieved_documents: list[dict[str, Any]]
+    sources_retrieved: list[dict[str, Any]]
     tool_results: dict[str, Any]
     tools_used: list[str]
     student: dict[str, Any]

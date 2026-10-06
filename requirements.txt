@@ -7,6 +7,12 @@ pydantic-settings
 # AI and retrieval
 langgraph
 chromadb
+sentence-transformers
+pypdf
+PyYAML
+python-multipart
+pdf2image
+pytesseract
 openai
 
 # Development
