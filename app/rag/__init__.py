@@ -1,1 +1,1 @@
-"""OWNER: rag. TODO steps 1 and 5: provide document ingestion and retrieval."""
+"""Scaffold only: implementation is reserved for the owning teammate."""

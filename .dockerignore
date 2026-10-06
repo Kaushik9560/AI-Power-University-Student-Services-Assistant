@@ -1,0 +1,17 @@
+.git
+.venv
+.local
+.python
+.cache
+.runtime
+.hf
+.env
+__pycache__
+**/__pycache__
+.pytest_cache
+tests/_tmp
+data/chroma
+data/*.db
+data/*.db-*
+*.zip
+:memory:*

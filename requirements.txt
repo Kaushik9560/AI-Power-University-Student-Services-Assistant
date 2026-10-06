@@ -1,20 +1,24 @@
-# Application
-fastapi
-uvicorn[standard]
-pydantic
-pydantic-settings
-
-# AI and retrieval
-langgraph
-chromadb
-sentence-transformers
-pypdf
-PyYAML
-python-multipart
-pdf2image
-pytesseract
-openai
-
-# Development
-pytest
-httpx
+# --- API / workflow
+fastapi>=0.115,<1.0
+uvicorn[standard]>=0.30
+pydantic>=2.7,<3.0
+pydantic-settings>=2.12,<3.0
+python-multipart>=0.0.9
+python-dotenv>=1.0
+httpx>=0.27
+langgraph>=0.2,<0.4
+# --- RAG
+chromadb>=0.5,<0.7
+# Chroma 0.6 calls the positional capture API removed in PostHog 6.
+posthog>=2.4,<6
+sentence-transformers>=3.0
+pypdf>=4.0
+PyYAML>=6.0
+# --- UI
+streamlit>=1.36
+requests>=2.32
+# --- tests
+pytest>=8.0
+# --- OCR for scanned PDFs (also needs tesseract + poppler binaries)
+pytesseract>=0.3
+pdf2image>=1.17

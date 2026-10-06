@@ -1,11 +1,29 @@
-# OWNER: infra. TODO step 8: define the complete local demo stack.
+# docker compose up  → API on :8000, UI on :8501. Ollama runs on the HOST (see README "Ollama").
 services:
   api:
     build: .
-    ports:
-      - "8000:8000"
-    env_file:
-      - path: .env
-        required: false
+    env_file: .env
+    environment:
+      - OLLAMA_BASE_URL=${DOCKER_OLLAMA_BASE_URL:-http://host.docker.internal:11434}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     volumes:
-      - ./data:/app/data
+      - ./data:/srv/data
+    ports: ["127.0.0.1:8000:8000"]
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000
+    healthcheck:
+      test: ["CMD", "python", "-c", "import json,urllib.request; assert json.load(urllib.request.urlopen('http://localhost:8000/health'))['status']=='ok'"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+
+  ui:
+    build: .
+    environment:
+      - API_BASE_URL=http://api:8000
+      - DEFAULT_STUDENT_ID=${DEFAULT_STUDENT_ID:-S1001}
+    ports: ["127.0.0.1:8501:8501"]
+    depends_on:
+      api:
+        condition: service_healthy
+    command: streamlit run ui/streamlit_app.py --server.port 8501 --server.address 0.0.0.0 --server.headless true --theme.base light
