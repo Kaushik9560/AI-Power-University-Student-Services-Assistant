@@ -1,1 +1,29 @@
-{}
+{
+  "system_prompt": "Generate fictional Indian-style student names for a software test fixture. Do not use real student rosters or external personal data. Return ONLY a JSON object with a names array of exactly 32 distinct full names.",
+  "user_prompt": "Generate 32 distinct fictional full names, each at least 3 characters long. No IDs, numbers, prose or markdown. These will label entirely synthetic NSUT demo records.",
+  "temperature": 0.4,
+  "calls": 3,
+  "runs": [
+    {
+      "model": "ollama:llama3.1:8b",
+      "tokens": 339,
+      "output": "[\n  \"Amita Singh\",\n  \"Kavita Rao\",\n  \"Rohan Kumar\",\n  \"Neha Jain\",\n  \"Deepak Agarwal\",\n  \"Priya Desai\",\n  \"Vivek Mehta\",\n  \"Shruti Gupta\",\n  \"Ankit Sharma\",\n  \"Riya Seth\",\n  \"Kushal Bhattacharya\",\n  \"Sonalika Chakraborty\",\n  \"Aarav Mittal\",\n  \"Tanisha Verma\",\n  \"Yash Jain\",\n  \"Hemlata Mishra\",\n  \"Aisha Khan\",\n  \"Kunal Sengupta\",\n  \"Nalini Srinivasan\",\n  \"Rishabh Goyal\",\n  \"Anushka Das\",\n  \"Sarvesh Tiwari\",\n  \"Divya Garg\",\n  \"Shreyansh Bajpai\",\n  \"Komal Saini\",\n  \"Nandini Chaudhary\",\n  \"Vanshika Dubey\",\n  \"Aisha Ali\",\n  \"Kartik Suresh\",\n  \"Shubhi Aggarwal\",\n  \"Ananya Chatterjee\"\n]",
+      "validation_error": "1 validation error for Names\nnames\n  List should have at least 32 items after validation, not 31 [type=too_short, input_value=['Amita Singh', 'Kavita R...l', 'Ananya Chatterjee'], input_type=list]\n    For further information visit https://errors.pydantic.dev/2.13/v/too_short"
+    },
+    {
+      "model": "ollama:llama3.1:8b",
+      "tokens": 335,
+      "output": "```\n{\n  \"names\": [\n    \"Aarav Kumar\",\n    \"Kaviya Sharma\",\n    \"Rohan Jain\",\n    \"Nalini Singh\",\n    \"Devansh Gupta\",\n    \"Ananya Mishra\",\n    \"Kabir Rao\",\n    \"Sofia Ali\",\n    \"Arjun Reddy\",\n    \"Priya Patel\",\n    \"Aisha Khan\",\n    \"Yash Desai\",\n    \"Shreya Bhatia\",\n    \"Vedant Mehta\",\n    \"Neha Verma\",\n    \"Rohan Bajaj\",\n    \"Aanya Saxena\",\n    \"Kushal Jain\",\n    \"Sakshi Agarwal\",\n    \"Anushka Chhabra\",\n    \"Rishabh Mittal\",\n    \"Shivani Sood\",\n    \"Dhruv Chawla\",\n    \"Kavita Sharma\",\n    \"Aaradhya Goyal\",\n    \"Rohan Kumar\",\n    \"Shreya Jain\",\n    \"Nalini Verma\",\n    \"Aisha Bhatia\",\n    \"Yash Mehta\",\n    \"Sofia Rao\"\n  ]\n}\n```",
+      "validation_error": "1 validation error for Names\nnames\n  List should have at least 32 items after validation, not 31 [type=too_short, input_value=['Aarav Kumar', 'Kaviya S...ash Mehta', 'Sofia Rao'], input_type=list]\n    For further information visit https://errors.pydantic.dev/2.13/v/too_short"
+    },
+    {
+      "model": "ollama:llama3.1:8b",
+      "tokens": 345,
+      "output": "```json\n{\n  \"names\": [\n    \"Rohan Kumar\",\n    \"Aarav Sharma\",\n    \"Kabir Singh\",\n    \"Aryan Das\",\n    \"Siddharth Roy\",\n    \"Rishabh Jain\",\n    \"Vivek Kumar\",\n    \"Shreyansh Agrawal\",\n    \"Anshul Gupta\",\n    \"Devansh Sharma\",\n    \"Keshav Tiwari\",\n    \"Pranav Mishra\",\n    \"Samarth Bajaj\",\n    \"Yuvraj Yadav\",\n    \"Aryan Agarwal\",\n    \"Vanshika Jain\",\n    \"Shivansh Dubey\",\n    \"Kunal Saxena\",\n    \"Anurag Verma\",\n    \"Sarthak Mittal\",\n    \"Rohan Bansal\",\n    \"Aarushi Singh\",\n    \"Kabir Jain\",\n    \"Siddharth Kumar\",\n    \"Rishabh Aggarwal\",\n    \"Vivek Sharma\",\n    \"Shreyansh Roy\",\n    \"Anshul Tiwari\",\n    \"Devansh Kumar\",\n    \"Keshav Mishra\",\n    \"Pranav Bajaj\"\n  ]\n}\n```",
+      "validation_error": "1 validation error for Names\nnames\n  List should have at least 32 items after validation, not 31 [type=too_short, input_value=['Rohan Kumar', 'Aarav Sh...Mishra', 'Pranav Bajaj'], input_type=list]\n    For further information visit https://errors.pydantic.dev/2.13/v/too_short"
+    }
+  ],
+  "valid": true,
+  "assembly": "32 distinct model-generated names assembled from validated partial responses",
+  "normalization": "Markdown fences removed; a top-level JSON names array is wrapped in the required object before schema validation."
+}

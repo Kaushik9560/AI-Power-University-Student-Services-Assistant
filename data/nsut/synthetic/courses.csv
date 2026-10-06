@@ -1,1 +1,11 @@
 course_code,course_name,programme,semester,credits
+CS201,Data Structures,B.Tech CSE,3,4
+MA201,Engineering Mathematics III,B.Tech CSE,3,4
+CS301,Database Management Systems,B.Tech CSE,5,4
+CS302,Operating Systems,B.Tech CSE,5,4
+CS401,Machine Learning,B.Tech CSE,7,3
+EC201,Signals and Systems,B.Tech ECE,3,4
+EC202,Engineering Mathematics III,B.Tech ECE,3,4
+EC301,Digital Communication,B.Tech ECE,5,4
+EC302,Microprocessors and Microcontrollers,B.Tech ECE,5,4
+EC401,VLSI Design,B.Tech ECE,7,3

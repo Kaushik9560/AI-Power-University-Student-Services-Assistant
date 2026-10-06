@@ -1,1 +1,10 @@
-Pending teammate contribution. This is a structure placeholder.
+Validation of data/nsut/synthetic
+
+students=32 programmes=2 batches=2 courses=10 attendance_rows=144 result_rows=97
+attendance % exactly 80: 13 | exactly 75: 2 | one class below 80 (78.0 of 50): 1
+results: {'FAIL': 10, 'PASS': 85, 'DETAINED': 1, 'ABSENT': 1}; marks total 39 (just below pass): 2
+students with >=2 backlogs: ['S1009']
+cgpa exactly 6.0: ['S1004'] | exactly 8.5: ['S1010']
+supplementary PASS rows: 0
+
+VIOLATIONS: 0

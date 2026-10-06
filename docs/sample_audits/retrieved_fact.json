@@ -1,1 +1,114 @@
-{}
+{
+  "trace_id": "c79ec3e9",
+  "timestamp": "2026-10-06T09:35:02Z",
+  "student_id": null,
+  "question": "What is the minimum attendance required to appear for end-semester exams?",
+  "as_of_date": "2026-10-06",
+  "question_category": "policy_fact",
+  "query_type": "policy",
+  "answer_type": "retrieved_fact",
+  "sources_retrieved": [
+    {
+      "doc_id": "DEMO-ATT-A",
+      "section": "1.1",
+      "page": null,
+      "score": 0.757
+    },
+    {
+      "doc_id": "DEMO-ATT-B",
+      "section": "1.1",
+      "page": null,
+      "score": 0.764
+    },
+    {
+      "doc_id": "NSUT-BTECH-2019",
+      "section": "11.2. The students must have a minimum attendance of 75% of the total number of",
+      "page": 18,
+      "score": 0.717
+    },
+    {
+      "doc_id": "NSUT-BTECH-2019",
+      "section": "11.7. Students who are not allowed to appear in the ESE due to shortage of attendance",
+      "page": 18,
+      "score": 0.546
+    },
+    {
+      "doc_id": "NSUT-BTECH-2019",
+      "section": "11.6. A student shall not be permitted to appear in the MSE/ESE if his/her attendance",
+      "page": 18,
+      "score": 0.572
+    },
+    {
+      "doc_id": "NSUT-CVSPK-2020",
+      "section": "5. Question papers of end semester examination with five best and five poorly",
+      "page": 45,
+      "score": 0.462
+    },
+    {
+      "doc_id": "NSUT-BTECH-2019",
+      "section": "7.7. A student may register for courses leading to a minimum number of credits as",
+      "page": 11,
+      "score": 0.536
+    },
+    {
+      "doc_id": "NSUT-BTECH-2019",
+      "section": "12.2. For promotion from even semester to the next odd semester (i.e. of the next",
+      "page": 19,
+      "score": 0.469
+    }
+  ],
+  "sources_used": [
+    {
+      "doc_id": "NSUT-BTECH-2019",
+      "section": "11.2. The students must have a minimum attendance of 75% of the total number of",
+      "page": 18,
+      "version": "2019-I(A)",
+      "effective_from": null
+    }
+  ],
+  "sources_dropped": [
+    {
+      "doc_id": "DEMO-ATT-A",
+      "chunk_id": "DEMO-ATT-A::1",
+      "reason": "not yet effective"
+    },
+    {
+      "doc_id": "DEMO-ATT-B",
+      "chunk_id": "DEMO-ATT-B::1",
+      "reason": "not yet effective"
+    }
+  ],
+  "precedence_decision": "NSUT-BTECH-2019 applies: level 1, effective n/a, in force on 2026-10-06",
+  "tools_invoked": [],
+  "rules_applied": [],
+  "conflicts_detected": [],
+  "assumptions": [],
+  "model": "ollama:llama3.1:8b",
+  "llm_calls": 1,
+  "tokens": 836,
+  "latency_ms": 10680,
+  "errors": [
+    "answer had no [S#] labels; matched supported figures and terms to evidence"
+  ],
+  "tool_plan": {},
+  "_response": {
+    "answer": "The minimum attendance required to appear for end-semester exams is 75% of the total number of classes, including lectures, tutorials, and practicals, held in a subject. This is stated in the NSUT Regulations for Bachelor of Technology, \u00a711.2. [S1] Future notice: Synthetic demo attendance notice A \u2014 not university-issued takes effect on 2026-11-01; it is not applied to this answer.",
+    "answer_type": "retrieved_fact",
+    "citations": [
+      {
+        "label": "S1",
+        "doc_id": "NSUT-BTECH-2019",
+        "title": "NSUT Regulations for Bachelor of Technology",
+        "section": "11.2. The students must have a minimum attendance of 75% of the total number of",
+        "page": 18,
+        "version": "2019-I(A)",
+        "effective_from": null,
+        "authority_level": 1,
+        "issuer": "Netaji Subhas University of Technology",
+        "excerpt": "11.2. The students must have a minimum attendance of 75% of the total number of\nclasses including lectures, tutorials and practicals, held in a subject till MSE/ESE in \norder to be eligible to appear in the MSE/ESE for that subject."
+      }
+    ],
+    "applied_rules": [],
+    "verdict": null
+  }
+}

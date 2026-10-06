@@ -22,7 +22,6 @@ class AssistantState(TypedDict, total=False):
     message: str                    # text for clarification / refused answers
 
     # ---- retrieve + resolve ---------------------------------------------
-    retrieved_documents: list[dict]  # existing RAG node output
     retrieved_chunks: list[Any]     # RetrievedChunk objects (internal)
     sources_retrieved: list[dict]   # audit view: {doc_id, section, score}
     evidence: list[dict]            # chunks that survived precedence

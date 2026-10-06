@@ -1,1 +1,14 @@
 rule_id,description,parameter,operator,value,scope_programmes,scope_batches,effective_from,effective_to,source_doc_id,source_section
+ATT-MIN-01,Minimum attendance to appear for the end-semester examination (until revised),min_attendance_pct,>=,75,ALL,ALL,2024-07-01,2026-01-14,ACAD-REG-2024,7.2
+ATT-MIN-02,Minimum attendance to appear for the end-semester examination (revised by circular),min_attendance_pct,>=,80,ALL,ALL,2026-01-15,,CIR-ACAD-2026-03,2.1
+ATT-CONDONE-01,Maximum attendance shortage condonable on medical grounds (percentage points),condonation_max_shortage_pct,<=,10,ALL,ALL,2024-07-01,,ACAD-REG-2024,7.3
+PASS-TOTAL-01,Minimum total marks percentage to pass a course,min_total_pct,>=,40,ALL,ALL,2024-07-01,,ACAD-REG-2024,8.1
+PASS-EXT-01,Minimum end-semester examination percentage to pass a course,min_external_pct,>=,35,ALL,ALL,2024-07-01,,ACAD-REG-2024,8.1
+SUPP-ELIG-01,Regular result that makes a student eligible for the supplementary examination,supplementary_regular_result,in,FAIL;ABSENT,ALL,ALL,2024-07-01,,ACAD-REG-2024,9.1
+SUPP-ATTEMPTS-01,Supplementary attempts already used must be below this number to appear again,max_supplementary_attempts,<,4,ALL,ALL,2024-07-01,,ACAD-REG-2024,9.3
+PLACE-CGPA-01,Minimum CGPA to register for campus placement drives,placement_min_cgpa,>=,6.0,ALL,ALL,2025-07-15,,CIR-TPC-2025-07,2.1
+PLACE-BACKLOG-01,Maximum active backlogs allowed for placement registration,placement_max_active_backlogs,<=,0,ALL,ALL,2025-07-15,,CIR-TPC-2025-07,2.2
+PLACE-ATT-01,Minimum aggregate attendance in the current semester for placement registration,placement_min_aggregate_attendance_pct,>=,75,ALL,ALL,2025-07-15,,CIR-TPC-2025-07,2.3
+PROMO-BACKLOG-01,Maximum active backlogs allowed for promotion to the next year,promotion_max_active_backlogs,<=,4,ALL,ALL,2024-07-01,,ACAD-REG-2024,10.1
+SCH-MERIT-CGPA-01,Minimum CGPA for the Merit Scholarship,merit_scholarship_min_cgpa,>=,8.5,ALL,ALL,2025-08-01,,CIR-DSW-2025-02,1.1
+SCH-MCM-CGPA-01,Minimum CGPA for the Merit-cum-Means Scholarship,mcm_scholarship_min_cgpa,>=,7.5,ALL,ALL,2025-08-01,,CIR-DSW-2025-02,1.2

@@ -1,52 +1,63 @@
-"""Bulk-index the files listed in data/source_register.csv."""
+"""
+Ingest documents listed in data/source_register.csv (Annex B) into ChromaDB.
+
+    python scripts/ingest_documents.py                 # every row in the register
+    python scripts/ingest_documents.py --reset         # wipe the collection first
+    python scripts/ingest_documents.py path/to/doc.md  # one file (front-matter metadata)
+    python scripts/ingest_documents.py path/to/doc.pdf --metadata '{"doc_id": "...", ...}'
+
+Chroma is persisted to disk, so this is NOT re-run on every restart (guide §5). Re-running is
+safe: documents are keyed by doc_id and replaced.
+"""
 from __future__ import annotations
 
 import argparse
 import csv
+import json
+import sys
 from pathlib import Path
 
-from app.config import get_settings
-from app.rag.loader import load_file
-from app.rag.store import get_store, list_register
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
+from app.config import settings  # noqa: E402
+from app.rag.loader import load_file  # noqa: E402
+from app.rag.store import get_store, list_register  # noqa: E402
 
 
-def ingest_documents(reset: bool = False) -> list[tuple[str, int]]:
-    settings = get_settings()
-    register_path = Path(settings.source_register_path).resolve()
-    if not register_path.is_file():
-        raise FileNotFoundError(f"Source Register not found: {register_path}")
-
-    store = get_store()
+def ingest_from_register(store, reset: bool = False, register: Path | None = None) -> int:
+    register = register or settings.SOURCE_REGISTER
     if reset:
-        for entry in list_register():
-            store.delete_document(entry["doc_id"])
-
-    results = []
-    with register_path.open(newline="", encoding="utf-8-sig") as register_file:
-        rows = csv.DictReader(register_file)
-        if not {"doc_id", "file"}.issubset(rows.fieldnames or []):
-            raise ValueError("Source Register must include doc_id and file columns")
-        for row in rows:
-            source_path = (register_path.parent / row["file"]).resolve()
-            if not source_path.is_relative_to(register_path.parent.resolve()):
-                raise ValueError(f"source path escapes the data directory: {row['file']}")
-            if not source_path.is_file():
-                raise FileNotFoundError(f"Registered source not found: {source_path}")
-            document = load_file(source_path, row)
-            if not document.text.strip():
-                raise ValueError(f"Registered source has no extractable text: {source_path}")
-            results.append((document.metadata.doc_id, store.index_document(document)))
-    return results
+        for src in list_register():
+            store.delete_document(src["doc_id"])
+    total = 0
+    with open(register, newline="", encoding="utf-8") as f:
+        for row in csv.DictReader(f):
+            path = register.parent / row["file"]
+            doc = load_file(path, metadata={k: v for k, v in row.items() if k != "file"})
+            n = store.index_document(doc)
+            total += n
+            m = doc.metadata
+            print(f"  {m.doc_id:<20} L{m.authority_level} {m.doc_type:<10} v{m.version:<5} "
+                  f"from={m.effective_from or '-':<10} to={m.effective_to or '-':<10} "
+                  f"supersedes={';'.join(m.supersedes) or '-':<22} chunks={n:>3}")
+    return total
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--reset", action="store_true", help="remove existing registered documents first")
-    args = parser.parse_args()
-    results = ingest_documents(reset=args.reset)
-    for doc_id, count in results:
-        print(f"{doc_id}: indexed {count} chunks")
-    print(f"Indexed {len(results)} documents")
+    ap = argparse.ArgumentParser()
+    ap.add_argument("path", nargs="?", help="a single .md/.txt/.pdf to ingest (default: the whole register)")
+    ap.add_argument("--metadata", default=None, help="JSON metadata for a single file")
+    ap.add_argument("--reset", action="store_true")
+    args = ap.parse_args()
+    store = get_store()
+    if args.path:
+        doc = load_file(Path(args.path), metadata=json.loads(args.metadata) if args.metadata else None)
+        n = store.index_document(doc)
+        print(f"{doc.metadata.doc_id}: {n} chunks")
+    else:
+        total = ingest_from_register(store, reset=args.reset)
+        print(f"\n{len(list_register())} documents in the register, {total} chunks indexed this run, "
+              f"{store.count()} chunks in the store.")
 
 
 if __name__ == "__main__":

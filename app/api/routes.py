@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 import json
-import importlib
 import logging
 import sqlite3
 import tempfile
@@ -13,42 +12,17 @@ from typing import Optional
 from fastapi import APIRouter, File, Form, Header, HTTPException, UploadFile
 
 from app.api.schemas import AskRequest, AskResponse, HealthResponse, IngestResponse
+from app.audit.store import audit_health, read_audit
+from app.db.database import get_connection, load_csv_tables, sqlite_health
+from app.graph.workflow import run_query
+from app.rag.embeddings import embedding_health
 from app.rag.loader import load_bytes
 from app.rag.store import get_store, list_register
+from app.services.llm import get_llm
 from app.services.conversation import continue_clarification
 
 log = logging.getLogger(__name__)
 router = APIRouter()
-
-
-def _backend_call(module: str, function: str, *args, **kwargs):
-    """Resolve pending team services when used, so integrated RAG routes remain available."""
-    try:
-        callback = getattr(importlib.import_module(module), function)
-    except (ImportError, AttributeError) as exc:
-        raise HTTPException(status_code=503, detail="Student services are being configured. Please try again later.") from exc
-    return callback(*args, **kwargs)
-
-
-def read_audit(trace_id: str):
-    return _backend_call("app.audit.store", "read_audit", trace_id)
-
-
-def run_query(*args, **kwargs):
-    return _backend_call("app.graph.workflow", "run_query", *args, **kwargs)
-
-
-def _component_health(module: str, function: str, *, object_health: bool = False) -> dict:
-    try:
-        result = _backend_call(module, function)
-        return result.health() if object_health else result
-    except HTTPException as exc:
-        if exc.status_code == 503:
-            return {"status": "pending"}
-        raise
-    except Exception:
-        log.exception("Component health check failed: %s", module)
-        return {"status": "error"}
 
 
 @router.post("/ask", response_model=AskResponse, response_model_exclude_none=False)
@@ -81,7 +55,7 @@ def ask(req: AskRequest, x_student_id: Optional[str] = Header(default=None, alia
     )
 
 
-@router.post("/ingest", response_model=IngestResponse, response_model_exclude_unset=True)
+@router.post("/ingest", response_model=IngestResponse)
 async def ingest(file: UploadFile = File(...), metadata: str = Form(default="{}")) -> IngestResponse:
     """
     Multipart: `file` (.md/.txt/.pdf) + `metadata` (JSON string with the Source Register fields,
@@ -93,17 +67,19 @@ async def ingest(file: UploadFile = File(...), metadata: str = Form(default="{}"
         raise HTTPException(status_code=400, detail=f"metadata is not valid JSON: {exc}") from exc
     if not isinstance(meta, dict):
         raise HTTPException(status_code=400, detail="metadata must be a JSON object")
-    if not file.filename:
-        raise HTTPException(status_code=400, detail="uploaded file must have a filename")
+    data = await file.read()
     try:
-        doc = load_bytes(file.filename, await file.read(), meta)
-        if not doc.text.strip():
-            raise ValueError("document contains no extractable text")
-        n = get_store().index_document(doc)
-    except (ValueError, RuntimeError) as exc:
+        doc = load_bytes(file.filename or "document.txt", data, meta)
+    except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
+    if not doc.text.strip():
+        raise HTTPException(status_code=400, detail="document has no extractable text (enable OCR_ENABLED for scans)")
+    n = get_store().index_document(doc)
+    with get_connection() as connection:
+        rules = [row[0] for row in connection.execute(
+            "SELECT rule_id FROM rule_registry WHERE source_doc_id = ? AND rule_id LIKE 'AUTO-%'", (doc.metadata.doc_id,))]
     return IngestResponse(doc_id=doc.metadata.doc_id, chunks_indexed=n, status="indexed",
-                          title=doc.metadata.title, total_documents=len(list_register()))
+                          title=doc.metadata.title, total_documents=len(list_register()), rules_registered=rules)
 
 
 @router.get("/sources")
@@ -122,13 +98,10 @@ def audit(trace_id: str) -> dict:
 
 @router.get("/health", response_model=HealthResponse)
 def health() -> HealthResponse:
-    vs = get_store().health()
-    db = _component_health("app.db.database", "sqlite_health")
-    llm = _component_health("app.services.llm", "get_llm", object_health=True)
+    vs, db, llm = get_store().health(), sqlite_health(), get_llm().health()
     overall = "ok" if vs.get("status") == "ok" and db.get("status") == "ok" and llm.get("status") == "ok" else "degraded"
     return HealthResponse(status=overall, api="ok", vector_store=vs, sqlite=db, llm=llm,
-                          embeddings=_component_health("app.rag.embeddings", "embedding_health"),
-                          audit=_component_health("app.audit.store", "audit_health"))
+                          embeddings=embedding_health(), audit=audit_health())
 
 
 @router.post("/admin/load-students")
@@ -147,12 +120,12 @@ async def load_students(files: list[UploadFile] = File(...), replace: bool = For
             p.write_bytes(await f.read())
             loaded[name] = p
         if all(name in loaded for name in ("students", "courses", "attendance", "results")):
-            errors, _ = _backend_call("scripts.validate_students", "validate", Path(tmp))
+            from scripts.validate_students import validate
+            errors, _ = validate(Path(tmp))
             if errors:
                 raise HTTPException(status_code=400, detail={"validation_errors": errors[:20]})
         try:
-            loaded = _backend_call("app.db.database", "load_csv_tables", loaded, replace=replace)
+            loaded = load_csv_tables(loaded, replace=replace)
         except (ValueError, sqlite3.IntegrityError) as exc:
             raise HTTPException(status_code=400, detail=str(exc)) from exc
-    return {"status": "loaded", "rows": loaded,
-            "sqlite": _backend_call("app.db.database", "sqlite_health")}
+    return {"status": "loaded", "rows": loaded, "sqlite": sqlite_health()}

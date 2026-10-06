@@ -1,15 +1,10 @@
-# Team contribution scope
+# Team contribution statement (fill in before submission — guide §9.4)
 
-| Scope | Contributor | Status |
-|---|---|---|
-| Streamlit frontend, FastAPI request/response flow, clarification context | Kaushik (`Kaushik9560`) | Implemented in this branch, AI-assisted |
-| Deterministic classifier and access checks | Kaushik (`Kaushik9560`) | Implemented in this branch, AI-assisted |
-| LangGraph shared state, conditional edges and orchestration | Kaushik (`Kaushik9560`) | Implemented in this branch, AI-assisted |
-| Conversation integration tests and isolated API boundary tests | Kaushik (`Kaushik9560`) | Included; require remaining backend and fixtures |
-| RAG loading/chunking/embeddings/store, retrieval node, configuration and RAG tests | Butola006 | Existing main contribution preserved, with original history |
-| Database/tools, rules, LLM/generation, audit, bootstrap, fixtures and remaining scripts/tests | Owning teammates | Placeholders; contributors will add their implementations |
+| Member | Owned area (branch) | Files | Can explain |
+|---|---|---|---|
+| _name_ | rag | `app/rag/*`, `app/graph/nodes/retrieve.py`, `data/documents/*`, `scripts/ingest_documents.py` | chunking, embeddings choice, live ingest |
+| _name_ | student-data | `app/db/*`, `app/tools/*`, `app/graph/nodes/tools.py`, `data/synthetic/*`, `scripts/generate_students.py`, `scripts/validate_students.py`, `scripts/load_students.py` | schema, tools, synthetic data kit |
+| _name_ | rules | `app/rules/*`, `app/graph/nodes/resolve.py`, `tests/test_precedence.py`, `tests/test_eligibility.py` | Annex A precedence, rule registry, eligibility |
+| _name_ | llm + ui + audit-eval | `app/services/llm.py`, `app/graph/prompts.py`, `app/graph/nodes/generate.py`, `app/graph/nodes/validate.py`, `app/audit/*`, `ui/*`, `scripts/evaluation.py` | prompt design, fallback chain, evaluation method |
 
-Exact implementation files are listed in the root README. Configuration and dataset
-headers describe the integration contract; they contain no teammate backend code or
-student records. Existing commits and teammate branches are preserved. API compatibility adjustments
-keep the existing RAG ingestion contract while integrating the new request flow.
+Git history: every member commits on their own branch and squash-merges to `main` (see `CONTRIBUTING.md`).

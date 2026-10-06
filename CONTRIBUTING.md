@@ -1,22 +1,30 @@
-# Team integration
+# Working in parallel
 
-This branch contains Kaushik's frontend/API, classifier and graph-orchestration
-contribution. The existing RAG contribution is preserved. Other pending implementation files
-are placeholders so each member can add
-their own code from their own account.
+| Area (branch) | Files you own |
+|---|---|
+| `rag` | `app/rag/*`, `app/graph/nodes/retrieve.py`, `data/documents/*`, `data/source_register.csv`, `scripts/ingest_documents.py` |
+| `student-data` | `app/db/*`, `app/tools/*`, `app/graph/nodes/tools.py`, `data/synthetic/*`, `scripts/generate_students.py`, `scripts/validate_students.py`, `scripts/load_students.py`, `tests/test_tools.py` |
+| `rules` | `app/rules/*`, `app/graph/nodes/resolve.py`, `tests/test_precedence.py`, `tests/test_eligibility.py` |
+| `llm` | `app/services/llm.py`, `app/graph/prompts.py`, `app/graph/nodes/generate.py` |
+| `audit-eval` | `app/audit/*`, `app/graph/nodes/validate.py`, `scripts/evaluation.py`, `scripts/make_sample_audits.py`, `data/evaluation/*`, `docs/evaluation_report.md` |
+| `ui` | `ui/*` |
+| `infra` | `Dockerfile`, `docker-compose.yml`, `README.md`, `docs/*` |
 
-Fetch the `kaushik` branch before starting integration. Create an area branch from
-that layout, fill only your owned modules, then open a pull request for team review.
-Existing member branches remain available; merge their actual implementations with
-care because some earlier interfaces differ from this layout.
+Shared files — say so in chat before editing, keep the change tiny, separate commit:
+`app/graph/state.py` (append keys only), `app/graph/workflow.py`, `app/graph/nodes/_common.py`,
+`app/api/schemas.py`, `app/api/routes.py`, `app/config.py`, `.env.example`, `requirements.txt`.
 
-API integration requires bootstrap/data loading, audit storage, retrieval ingestion,
-embeddings/store health functions, student tools, graph-node exports, rules and LLM
-generation. `tests/test_conversation.py` additionally needs synthetic fixtures and a
-working audit/pipeline implementation. The complete backend must pass integration
-tests before this partial contribution is promoted to `main`.
+```bash
+git checkout main && git pull
+git checkout -b rules                 # your area
+# small commits, each leaves the app runnable; commit at least hourly (guide §5.1)
+pytest tests -q                       # must pass before pushing
+git push -u origin rules              # PR → review by one teammate → squash-merge
+```
 
-Use `git add -p` for shared tracked files. For an untracked file, use `git add -N`
-first if you need to stage only selected hunks. Never commit `.env`, models, local
-environments, databases, logs or real student information. Disclose AI assistance
-and credit the actual contributor for each implementation.
+Rules: `main` always starts and passes tests; one PR = one area; never commit `.env`, `data/chroma/`,
+`data/*.db`; messages `area: what changed`. Tag the final commit `final`.
+
+Interfaces between areas: `tools.py` writes `facts`, `assumptions`, `tools_invoked`, `applied_rules`, `verdict`,
+`calculated_answer`; `resolve.py` writes `evidence`, `dropped_sources`, `upcoming_changes`, `conflicts`,
+`precedence_decision`; `generate.py` reads all of them; `validate.py` writes `citations` and the audit row.

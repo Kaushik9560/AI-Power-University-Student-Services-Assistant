@@ -1,68 +1,62 @@
-"""Embedding providers for semantic search and dependency-light offline tests."""
+"""
+Embeddings. Default all-MiniLM-L6-v2 (384-d, ~80 MB, fast on CPU). BAAI/bge-small-en-v1.5
+is the alternative the guide allows (EMBEDDING_PROVIDER=bge). EMBEDDING_PROVIDER=hash is a
+dependency-free bag-of-words vector for offline tests only — never for the demo.
+
+Why MiniLM: the corpus is small (hundreds of chunks), queries are short English questions,
+and the deciding logic is metadata precedence, not fine-grained semantic ranking. MiniLM
+is 3x faster than bge-small on CPU with no measurable difference on our evaluation set
+(see docs/evaluation_report.md, configuration comparison).
+"""
 from __future__ import annotations
 
 import hashlib
 import math
 import re
-from collections.abc import Callable
+from typing import Callable
 
-from app.config import get_settings
+from app.config import settings
 
-EmbeddingFunction = Callable[[list[str]], list[list[float]]]
-_MODELS = {
-    "minilm": "sentence-transformers/all-MiniLM-L6-v2",
-    "bge": "BAAI/bge-small-en-v1.5",
-}
+EmbedFn = Callable[[list[str]], list[list[float]]]
+_MODEL_NAMES = {"minilm": "sentence-transformers/all-MiniLM-L6-v2", "bge": "BAAI/bge-small-en-v1.5"}
+
+
+def _hash_embed(texts: list[str], dim: int = 512) -> list[list[float]]:
+    out = []
+    for t in texts:
+        vec = [0.0] * dim
+        for tok in re.findall(r"[a-z0-9]+", t.lower()):
+            h = int(hashlib.md5(tok.encode()).hexdigest(), 16)
+            vec[h % dim] += 1.0
+        norm = math.sqrt(sum(v * v for v in vec)) or 1.0
+        out.append([v / norm for v in vec])
+    return out
+
+
 _model = None
-_loaded_model_name: str | None = None
+_model_name = None
 
 
-def _hash_embeddings(texts: list[str], dimensions: int = 512) -> list[list[float]]:
-    vectors = []
-    for text in texts:
-        vector = [0.0] * dimensions
-        for token in re.findall(r"[a-z0-9]+", text.lower()):
-            digest = hashlib.md5(token.encode("utf-8")).digest()
-            index = int.from_bytes(digest[:4], "big") % dimensions
-            vector[index] += 1.0
-        norm = math.sqrt(sum(value * value for value in vector)) or 1.0
-        vectors.append([value / norm for value in vector])
-    return vectors
+def model_name() -> str:
+    if settings.EMBEDDING_PROVIDER == "hash":
+        return "hash-bow (tests only)"
+    return _MODEL_NAMES.get(settings.EMBEDDING_PROVIDER, settings.EMBEDDING_MODEL)
 
 
-def model_name(provider: str | None = None) -> str:
-    settings = get_settings()
-    selected = (provider or settings.embedding_provider).lower()
-    if selected == "hash":
-        return "hash-bow (offline tests)"
-    return _MODELS.get(selected, settings.embedding_model)
-
-
-def _sentence_transformer_embeddings(texts: list[str], provider: str) -> list[list[float]]:
-    global _model, _loaded_model_name
-    name = model_name(provider)
-    if _model is None or _loaded_model_name != name:
+def _st_embed(texts: list[str]) -> list[list[float]]:
+    global _model, _model_name
+    name = model_name()
+    if _model is None or _model_name != name:
         from sentence_transformers import SentenceTransformer
 
         _model = SentenceTransformer(name)
-        _loaded_model_name = name
+        _model_name = name
     return _model.encode(texts, normalize_embeddings=True, show_progress_bar=False).tolist()
 
 
-def get_embedding_function(provider: str | None = None) -> EmbeddingFunction:
-    selected = (provider or get_settings().embedding_provider).lower()
-    if selected == "hash":
-        return _hash_embeddings
-    if selected not in _MODELS:
-        raise ValueError(f"Unsupported embedding provider: {selected}")
-    return lambda texts: _sentence_transformer_embeddings(texts, selected)
+def get_embed_fn() -> EmbedFn:
+    return _hash_embed if settings.EMBEDDING_PROVIDER == "hash" else _st_embed
 
 
-def embed_texts(texts: list[str]) -> list[list[float]]:
-    """Return normalized vectors using the configured provider."""
-    return get_embedding_function()(texts)
-
-
-def embedding_health() -> dict[str, str]:
-    provider = get_settings().embedding_provider
-    return {"provider": provider, "model": model_name(provider)}
+def embedding_health() -> dict:
+    return {"provider": settings.EMBEDDING_PROVIDER, "model": model_name()}

@@ -1,1 +1,80 @@
-{}
+{
+  "trace_id": "d64d0f21",
+  "timestamp": "2026-10-06T09:35:06Z",
+  "student_id": null,
+  "question": "What is the scholarship for studying in Antarctica?",
+  "as_of_date": "2026-10-06",
+  "question_category": "policy_fact",
+  "query_type": "policy",
+  "answer_type": "not_found",
+  "sources_retrieved": [
+    {
+      "doc_id": "NSUT-CVSPK-2020",
+      "section": "4. Sanction of Scholarship and Incentives:",
+      "page": 13,
+      "score": 0.392
+    },
+    {
+      "doc_id": "NSUT-CVSPK-2020",
+      "section": "3. Criteria for Sanction of Scholarship and Incentives:",
+      "page": 12,
+      "score": 0.377
+    },
+    {
+      "doc_id": "NSUT-CVSPK-2020",
+      "section": "3. Criteria for Sanction of Scholarship and Incentives:",
+      "page": 12,
+      "score": 0.405
+    },
+    {
+      "doc_id": "NSUT-CVSPK-2020",
+      "section": "10. Scholarship/assistance received from other sources, if any:\u2026\u2026\u2026",
+      "page": 14,
+      "score": 0.342
+    },
+    {
+      "doc_id": "NSUT-CVSPK-2020",
+      "section": "3. Criteria for Sanction of Scholarship and Incentives:",
+      "page": 12,
+      "score": 0.393
+    },
+    {
+      "doc_id": "NSUT-CVSPK-2020",
+      "section": "3. Criteria for Sanction of Scholarship and Incentives:",
+      "page": 12,
+      "score": 0.386
+    },
+    {
+      "doc_id": "NSUT-CVSPK-2020",
+      "section": "3. Criteria for Sanction of Scholarship and Incentives:",
+      "page": 13,
+      "score": 0.362
+    },
+    {
+      "doc_id": "NSUT-CVSPK-2020",
+      "section": "3. Criteria for Sanction of Scholarship and Incentives:",
+      "page": 13,
+      "score": 0.385
+    }
+  ],
+  "sources_used": [],
+  "sources_dropped": [],
+  "precedence_decision": "NSUT-CVSPK-2020 applies: level 1, effective n/a, in force on 2026-10-06",
+  "tools_invoked": [],
+  "rules_applied": [],
+  "conflicts_detected": [],
+  "assumptions": [],
+  "model": "none",
+  "llm_calls": 0,
+  "tokens": 0,
+  "latency_ms": 16,
+  "errors": [],
+  "tool_plan": {},
+  "_response": {
+    "answer": "I could not find this information in the authorised university sources.",
+    "answer_type": "not_found",
+    "citations": [],
+    "applied_rules": [],
+    "verdict": null
+  }
+}
