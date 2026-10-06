@@ -7,21 +7,51 @@ HCLTech Future Ready AI Engineer Hackathon — AI-Powered University Student Ser
 
 ## Architecture
 
-```
-Student ──▶ Streamlit UI ──▶ FastAPI /ask  (X-Student-Id header, as_of_date)
-                                  │
-                       ONE LangGraph workflow, six nodes, no loops, no autonomous agents
-                                  │
-   classify_query ──┬─ policy ───────────▶ retrieve_documents ───────────────┐
-   (keyword routing,├─ personal ─────────▶ execute_tools ────────────────────┤
-    header-only id) ├─ eligibility ──────▶ retrieve_documents → execute_tools┤
-                    ├─ multi_step ───────▶ retrieve_documents → execute_tools┤
-                    └─ clarification / refused ──────────────────────────────┤
-                                                                             ▼
-          resolve_sources_and_rules ──▶ generate_answer ──▶ validate_and_audit ──▶ JSON + citations
-          (Annex A precedence, CODE)     (LLM explains)      (citations, id scrub, audit row)
+One LangGraph workflow, six nodes, no loops, no autonomous agents.
 
-   retrieve_documents → ChromaDB (persisted)      execute_tools → SQLite tools + rule_registry
+```mermaid
+graph TD
+    A["👤 Student"] -->|question| B["🎨 Streamlit UI"]
+    B -->|X-Student-Id<br/>as_of_date| C["⚡ FastAPI /ask"]
+
+    C --> D["🎯 classify_query<br/>(keyword routing)"]
+
+    D -->|policy| E["📚 retrieve_documents"]
+    D -->|personal| F["🔧 execute_tools"]
+    D -->|eligibility| G["📚 retrieve_documents<br/>+ 🔧 execute_tools"]
+    D -->|multi_step| H["📚 retrieve_documents<br/>+ 🔧 execute_tools"]
+    D -->|clarification/<br/>refused| I["❌ clarification / refused"]
+
+    E --> J["🔍 resolve_sources_and_rules<br/>(Annex A precedence)"]
+    F --> J
+    G --> J
+    H --> J
+    I --> J
+
+    J --> K["💬 generate_answer<br/>(LLM explains)"]
+    K --> L["✅ validate_and_audit<br/>(citations, id scrub, audit row)"]
+    L --> M["📤 JSON + citations"]
+
+    N["💾 ChromaDB<br/>persisted"] -.->|retrieval| E
+    O["🗄️ SQLite + rule_registry"] -.->|student facts / rules| F
+    O -.->|eligibility / rules| G
+    O -.->|facts / rules| H
+
+    style A fill:#e1f5ff,stroke:#4a90e2,stroke-width:1px
+    style B fill:#fff3e0,stroke:#f39c12,stroke-width:1px
+    style C fill:#f3e5f5,stroke:#8e44ad,stroke-width:1px
+    style D fill:#fff9c4,stroke:#f1c40f,stroke-width:1px
+    style E fill:#e8f5e9,stroke:#27ae60,stroke-width:1px
+    style F fill:#e3f2fd,stroke:#2980b9,stroke-width:1px
+    style G fill:#fbe9e7,stroke:#e67e22,stroke-width:1px
+    style H fill:#fbe9e7,stroke:#e67e22,stroke-width:1px
+    style I fill:#ffebee,stroke:#e74c3c,stroke-width:1px
+    style J fill:#e8f5e9,stroke:#2ecc71,stroke-width:1px
+    style K fill:#fce4ec,stroke:#c2185b,stroke-width:1px
+    style L fill:#ede7f6,stroke:#673ab7,stroke-width:1px
+    style M fill:#e0f2f1,stroke:#009688,stroke-width:1px
+    style N fill:#fff8e1,stroke:#ffb300,stroke-width:1px
+    style O fill:#eaf2ff,stroke:#3f51b5,stroke-width:1px
 ```
 
 | Layer | Choice | Why |
@@ -57,6 +87,7 @@ pytest tests -q                                           # 32 offline tests (no
 cp .env.example .env
 docker compose up --build           # API :8000, UI :8501; loads data and ingests the register on start
 ```
+
 Ollama runs on the **host**; the container reaches it at `http://host.docker.internal:11434`
 (set `OLLAMA_BASE_URL` in `.env` if yours differs). The embedding model is baked into the image.
 
