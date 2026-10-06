@@ -7,4 +7,5 @@ from app.rag.store import search
 def retrieve_node(state: AssistantState) -> AssistantState:
     """Write ranked documents to ``retrieved_documents``."""
 
-    return {**state, "retrieved_documents": search(state.get("question", ""))}
+    results = search(state.get("question", ""))
+    return {**state, "retrieved_documents": results, "sources_retrieved": results}
