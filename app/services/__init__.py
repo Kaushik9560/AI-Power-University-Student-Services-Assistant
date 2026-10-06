@@ -1,1 +1,1 @@
-"""Application service integrations."""
+"""Scaffold only: implementation is reserved for the owning teammate."""

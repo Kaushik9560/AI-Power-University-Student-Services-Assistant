@@ -1,0 +1,1 @@
+-- Scaffold only. The student-data teammate will add the schema.

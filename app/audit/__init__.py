@@ -1,1 +1,1 @@
-"""OWNER: audit-eval. TODO step 6: record auditable assistant decisions."""
+"""Scaffold only: implementation is reserved for the owning teammate."""
