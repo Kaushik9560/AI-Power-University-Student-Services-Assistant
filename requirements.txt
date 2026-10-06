@@ -1,0 +1,14 @@
+# Application
+fastapi
+uvicorn[standard]
+pydantic
+pydantic-settings
+
+# AI and retrieval
+langgraph
+chromadb
+openai
+
+# Development
+pytest
+httpx
